@@ -1,3 +1,8 @@
+WIP
+- I have Workload Identity Federation working but impersonation of a user isn't working.
+   - Followed this exactly and setup cal-staging->dev with env variables to get it working
+     - https://vercel.com/docs/security/secure-backend-access/oidc/gcp
+     - The environments are production,preview,local,development that I used. For local testing with VERCEL_OIDC_TOKEN it uses local AFAIU. You can get VERCEL_OIDC_TOKEN from vercel env pull locally and then can test Workload Identity Federation locally.
 ## Version 1.0
 ### Release Plan
   1. Read the document(domain-wide-delegation.md) and acknowledge it.

@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { calendar_v3 } from "@googleapis/calendar";
 import type { Prisma } from "@prisma/client";
+import { getVercelOidcToken } from "@vercel/functions/oidc";
+import { ExternalAccountClient, GoogleAuth } from "google-auth-library";
 import { OAuth2Client, JWT } from "googleapis-common";
 import type { GaxiosResponse } from "googleapis-common";
 import { RRule } from "rrule";
@@ -48,6 +50,9 @@ import { markTokenAsExpired } from "../../_utils/oauth/markTokenAsExpired";
 import { OAuth2UniversalSchema } from "../../_utils/oauth/universalSchema";
 import { metadata } from "../_metadata";
 import { getGoogleAppKeys } from "./getGoogleAppKeys";
+
+// Feature flag to control which authentication method to use
+const USE_WORKLOAD_IDENTITY_FEDERATION = process.env.USE_WORKLOAD_IDENTITY_FEDERATION === "true";
 
 const log = logger.getSubLogger({ prefix: ["app-store/googlecalendar/lib/CalendarService"] });
 
@@ -221,34 +226,83 @@ export default class GoogleCalendarService implements Calendar {
     const serviceAccountClientId = domainWideDelegation.serviceAccountKey.client_id;
     const serviceAccountPrivateKey = domainWideDelegation.serviceAccountKey.private_key;
 
-    const authClient = new JWT({
-      email: serviceAccountClientEmail,
-      key: serviceAccountPrivateKey,
-      scopes: ["https://www.googleapis.com/auth/calendar"],
-      subject: emailToImpersonate,
-    });
+    let authClient;
 
-    try {
-      await authClient.authorize();
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.stack : error;
-      this.log.error("DWD: Error authorizing domain wide delegation", JSON.stringify(errorMessage));
+    if (USE_WORKLOAD_IDENTITY_FEDERATION) {
+      // Workload Identity Federation setup
+      const projectId = process.env.GCP_PROJECT_ID;
+      const projectNumber = process.env.GCP_PROJECT_NUMBER;
+      const poolId = process.env.GCP_WORKLOAD_IDENTITY_POOL_ID;
+      const providerId = process.env.GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID;
 
-      if ((error as any).response?.data?.error === "unauthorized_client") {
-        throw new CalendarAppDomainWideDelegationClientIdNotAuthorizedError(
-          "Make sure that the Client ID for the domain wide delegation is added to the Google Workspace Admin Console"
-        );
+      if (!projectId || !projectNumber || !poolId || !providerId || !serviceAccountClientEmail) {
+        throw new Error("Missing required environment variables for Workload Identity Federation");
+      }
+      this.log.debug(
+        "Using workload identity federation with service account",
+        safeStringify({
+          serviceAccountClientEmail,
+          emailToImpersonate,
+          projectId,
+          projectNumber,
+          poolId,
+          providerId,
+        })
+      );
+      let externalAccountClient;
+
+     
+      try {
+        externalAccountClient = ExternalAccountClient.fromJSON({
+          type: "external_account",
+          audience: `//iam.googleapis.com/projects/${projectNumber}/locations/global/workloadIdentityPools/${poolId}/providers/${providerId}`,
+          subject_token_type: "urn:ietf:params:oauth:token-type:jwt",
+          token_url: "https://sts.googleapis.com/v1/token",
+          service_account_impersonation_url: `https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${serviceAccountClientEmail}:generateAccessToken`,
+          scopes: ["https://www.googleapis.com/auth/calendar"],
+          subject_token_supplier: {
+            // Use the Vercel OIDC token as the subject token
+            getSubjectToken: getVercelOidcToken,
+          },
+        });
+      } catch (error) {
+        this.handleDwdAuthError(error);
       }
 
-      if ((error as any).response?.data?.error === "invalid_grant") {
-        throw new CalendarAppDomainWideDelegationInvalidGrantError(
-          "User might not exist in Google Workspace"
-        );
+      if (!externalAccountClient) {
+        throw new Error("Failed to initialize auth client");
       }
 
-      // Catch all error
-      throw new CalendarAppDomainWideDelegationError("Error authorizing domain wide delegation");
+      authClient = new GoogleAuth({
+        authClient: externalAccountClient,
+        clientOptions: {
+          subject: emailToImpersonate,
+        },
+      });
+
+      this.log.debug(
+        "Using workload identity federation with service account",
+        safeStringify({
+          serviceAccountClientEmail,
+          emailToImpersonate,
+        })
+      );
+    } else {
+      // Legacy service account setup
+      authClient = new JWT({
+        email: serviceAccountClientEmail,
+        key: serviceAccountPrivateKey,
+        scopes: ["https://www.googleapis.com/auth/calendar"],
+        subject: emailToImpersonate,
+      });
+      try {
+        await authClient?.authorize();
+      } catch (error) {
+        this.handleDwdAuthError(error);
+      }
     }
+
+
 
     this.log.debug(
       "Using domain wide delegation with service account email",
@@ -259,8 +313,9 @@ export default class GoogleCalendarService implements Calendar {
       })
     );
 
+    // Use type assertion to ensure compatibility
     return new calendar_v3.Calendar({
-      auth: authClient,
+      auth: authClient as OAuth2Client,
     });
   };
 
@@ -381,6 +436,23 @@ export default class GoogleCalendarService implements Calendar {
     return res.data;
   }
 
+  private handleDwdAuthError(error: unknown) {
+    const errorMessage = error instanceof Error ? error.stack : error;
+    this.log.error("DWD: Error authorizing domain wide delegation", JSON.stringify(errorMessage));
+
+    if ((error as any).response?.data?.error === "unauthorized_client") {
+      throw new CalendarAppDomainWideDelegationClientIdNotAuthorizedError(
+        "Make sure that the Client ID for the domain wide delegation is added to the Google Workspace Admin Console"
+      );
+    }
+
+    if ((error as any).response?.data?.error === "invalid_grant") {
+      throw new CalendarAppDomainWideDelegationInvalidGrantError("User might not exist in Google Workspace");
+    }
+
+    // Catch all error
+    throw new CalendarAppDomainWideDelegationError("Error authorizing domain wide delegation");
+  }
   async createEvent(
     calEventRaw: CalendarEvent,
     credentialId: number,
@@ -880,7 +952,8 @@ export default class GoogleCalendarService implements Calendar {
       );
 
       if (!cals.items) return [];
-      return cals.items.map(
+
+      const items = cals.items.map(
         (cal) =>
           ({
             externalId: cal.id ?? "No id",
@@ -891,6 +964,9 @@ export default class GoogleCalendarService implements Calendar {
             email: cal.id ?? "",
           } satisfies IntegrationCalendar)
       );
+
+      console.log("Listed calendars", items);
+      return items;
     } catch (error) {
       this.log.error("There was an error getting calendars: ", safeStringify(error));
       throw error;
@@ -901,7 +977,9 @@ export default class GoogleCalendarService implements Calendar {
   async testDomainWideDelegationSetup() {
     const calendar = await this.authedCalendar();
     const cals = await calendar.calendarList.list({ fields: "items(id)" });
-    return !!cals.data.items;
+    const items = cals.data.items;
+    this.log.debug("Tested domain wide delegation setup", safeStringify({ items }));
+    return !!items;
   }
 
   /**
