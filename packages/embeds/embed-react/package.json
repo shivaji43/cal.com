@@ -54,6 +54,7 @@
     "vite": "^4.5.2"
   },
   "dependencies": {
+    "@calcom/atoms": "*",
     "@calcom/embed-core": "workspace:*",
     "@calcom/embed-snippet": "workspace:*"
   }

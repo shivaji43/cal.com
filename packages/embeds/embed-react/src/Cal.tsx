@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-
+// eslint-disable-next-line no-restricted-imports
+import { BookerEmbed } from "@calcom/atoms";
+// eslint-disable-next-line no-restricted-imports
+import "@calcom/atoms/globals.min.css";
 import type { PrefillAndIframeAttrsConfig } from "@calcom/embed-core";
-
-import useEmbed from "./useEmbed";
 
 type CalProps = {
   calOrigin?: string;
@@ -23,42 +23,14 @@ const Cal = function Cal(props: CalProps) {
   if (!calLink) {
     throw new Error("calLink is required");
   }
-  const initializedRef = useRef(false);
-  const Cal = useEmbed(embedJsUrl);
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!Cal || initializedRef.current || !ref.current) {
-      return;
-    }
-    initializedRef.current = true;
-    const element = ref.current;
-    if (namespace) {
-      Cal("init", namespace, {
-        ...initConfig,
-        origin: calOrigin,
-      });
-      Cal.ns[namespace]("inline", {
-        elementOrSelector: element,
-        calLink,
-        config,
-      });
-    } else {
-      Cal("init", {
-        ...initConfig,
-        origin: calOrigin,
-      });
-      Cal("inline", {
-        elementOrSelector: element,
-        calLink,
-        config,
-      });
-    }
-  }, [Cal, calLink, config, namespace, calOrigin, initConfig]);
-
-  if (!Cal) {
-    return null;
-  }
-
-  return <div ref={ref} {...restProps} />;
+  return (
+    <BookerEmbed
+      username="pro"
+      eventSlug="30min"
+      // onCreateBookingSuccess={(data) => {
+      //   router.push(`/${data.data.uid}`);
+      // }}
+    />
+  );
 };
 export default Cal;
