@@ -28,6 +28,7 @@ interface CreateUserInput {
   role?: UserPermissionRole;
   emailVerified?: Date;
   identityProvider?: IdentityProvider;
+  identityProviderId?: string;
 }
 
 interface OrgData {
