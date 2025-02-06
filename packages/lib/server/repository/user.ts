@@ -577,16 +577,22 @@ export class UserRepository {
     });
   }
 
-  static async create(
+  static async create({
+    data,
+  }: {
     data: Omit<Prisma.UserCreateInput, "password" | "organization" | "movedToProfile"> & {
       username: string;
       hashedPassword?: string;
-      organizationId: number | null;
       creationSource: CreationSource;
       locked: boolean;
-    }
-  ) {
-    const organizationId = data.organizationId;
+    };
+    orgData?: {
+      id: number;
+      role: MembershipRole;
+      accepted: boolean;
+    };
+  }) {
+    // const organizationId = data.organizationId;
     const { email, username, creationSource, ...rest } = data;
 
     console.log("create user", { email, username, organizationId });
@@ -614,14 +620,21 @@ export class UserRepository {
           },
         },
         creationSource,
-        ...(!!organizationId
+        ...(orgData
           ? {
-              organizationId: organizationId,
+              organizationId: orgData.id,
               profiles: {
                 create: {
                   username,
-                  organizationId: organizationId,
+                  organizationId: orgData.id,
                   uid: ProfileRepository.generateProfileUid(),
+                },
+              },
+              memberships: {
+                create: {
+                  role: orgData.role,
+                  accepted: orgData.accepted,
+                  teamId: orgData.id,
                 },
               },
             }
