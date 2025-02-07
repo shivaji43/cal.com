@@ -1,3 +1,5 @@
+import type z from "zod";
+
 import { hashPassword } from "@calcom/features/auth/lib/hashPassword";
 import { checkIfEmailIsBlockedInWatchlistController } from "@calcom/features/watchlist/operations/check-if-email-in-watchlist.controller";
 import type {
@@ -6,13 +8,14 @@ import type {
   IdentityProvider,
   MembershipRole,
 } from "@calcom/prisma/enums";
+import type { userMetadata } from "@calcom/prisma/zod-utils";
 
 import slugify from "../../slugify";
 import { UserRepository } from "../repository/user";
 
 interface CreateUserInput {
   email: string;
-  username: string;
+  username: string | null;
   name?: string;
   password?: string;
   brandColor?: string;
@@ -29,6 +32,7 @@ interface CreateUserInput {
   emailVerified?: Date;
   identityProvider?: IdentityProvider;
   identityProviderId?: string;
+  metadata?: z.infer<typeof userMetadata>;
 }
 
 interface OrgData {
