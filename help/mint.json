@@ -118,6 +118,7 @@
           "iconType": "solid",
           "pages": [
             "availabilities/date-overrides",
+            "availabilities/how-to-add-date-override",
             "availabilities/multiple-schedules",
             "availabilities/multiple-slots"
           ]
