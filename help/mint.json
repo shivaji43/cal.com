@@ -124,7 +124,7 @@
         },
         {
           "group": "Routing",
-          "icon": "arrow",
+          "icon": "arrow-right",
           "iconType": "solid",
           "pages": [
             "routing/routing-overview"
