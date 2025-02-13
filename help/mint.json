@@ -60,7 +60,6 @@
           "icon": "play",
           "iconType": "solid",
           "pages": [
-            "quick-start/quickstart",
             "quick-start/create-account",
             "quick-start/complete-onboarding",
             "quick-start/customization",
