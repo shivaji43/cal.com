@@ -123,6 +123,25 @@
           ]
         },
         {
+          "group": "Routing",
+          "icon": "arrow",
+          "iconType": "solid",
+          "pages": [
+            "routing/routing-overview"
+          ]
+        },
+        {
+          "group": "Availabilities",
+          "icon": "magnifying-glass",
+          "iconType": "solid",
+          "pages": [
+            "availabilities/date-overrides",
+            "availabilities/how-to-add-date-override",
+            "availabilities/multiple-schedules",
+            "availabilities/multiple-slots"
+          ]
+        },
+        {
           "group": "Bookings",
           "icon": "calendar-check",
           "iconType": "solid",
