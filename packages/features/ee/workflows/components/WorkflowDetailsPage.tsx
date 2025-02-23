@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Dispatch, SetStateAction } from "react";
 import { useState, useEffect } from "react";
@@ -166,6 +167,30 @@ export default function WorkflowDetailsPage(props: Props) {
               {t("delete_workflow")}
             </Button>
           )}
+          <div className="mt-4">
+            <div className="bg-default border-subtle text-default flex flex-col justify-between rounded-md border p-5">
+              <Link
+                href="/settings/billing"
+                className="group mb-2 text-xs font-medium uppercase opacity-70 hover:opacity-100">
+                {t("usage")}{" "}
+                <Icon
+                  name="chevron-right"
+                  className="-mt-px inline-block h-3 w-3 transition-all group-hover:ml-1"
+                />
+              </Link>
+              <small className="text-xs">You have used 100 credits this month.</small>
+              <div aria-hidden="true" className="mt-6">
+                <div className="overflow-hidden rounded-full bg-gray-200">
+                  <div style={{ width: "37.5%" }} className="h-2 rounded-full bg-green-600" />
+                </div>
+              </div>
+              <small className="mt-1 text-xs">Usage will reset Mar 13, 2025</small>
+              <Button color="minimal" className="mt-2 border-0 font-sans font-normal hover:bg-gray-300">
+                {t("buy_credits")}
+              </Button>
+            </div>
+          </div>
+
           <div className="border-subtle my-7 border-t md:border-none" />
         </div>
 

@@ -13,7 +13,7 @@ import { useRouterQuery } from "@calcom/lib/hooks/useRouterQuery";
 import { HttpError } from "@calcom/lib/http-error";
 import type { WorkflowRepository } from "@calcom/lib/server/repository/workflow";
 import { trpc } from "@calcom/trpc/react";
-import { AnimatedPopover, Avatar, CreateButtonWithTeamsList, showToast } from "@calcom/ui";
+import { AnimatedPopover, Avatar, Button, CreateButtonWithTeamsList, showToast } from "@calcom/ui";
 
 import { FilterResults } from "../../../filters/components/FilterResults";
 import { TeamsFilter } from "../../../filters/components/TeamsFilter";
@@ -72,23 +72,28 @@ function WorkflowsPage({ filteredList }: PageProps) {
           description={t("workflows_to_automate_notifications")}
           CTA={
             session.data?.hasValidLicense ? (
-              <CreateButtonWithTeamsList
-                subtitle={t("new_workflow_subtitle").toUpperCase()}
-                createFunction={(teamId?: number) => {
-                  createMutation.mutate({ teamId });
-                }}
-                isPending={createMutation.isPending}
-                disableMobileButton={true}
-                onlyShowWithNoTeams={true}
-                includeOrg={true}
-              />
+              <>
+                <CreateButtonWithTeamsList
+                  subtitle={t("new_workflow_subtitle").toUpperCase()}
+                  createFunction={(teamId?: number) => {
+                    createMutation.mutate({ teamId });
+                  }}
+                  isPending={createMutation.isPending}
+                  disableMobileButton={true}
+                  onlyShowWithNoTeams={true}
+                  includeOrg={true}
+                />
+              </>
             ) : null
           }>
           <>
             {filteredWorkflows?.totalCount ? (
               <div className="flex">
                 <TeamsFilter />
-                <div className="mb-4 ml-auto">
+                <div className="mb-4 ml-auto flex gap-2">
+                  <Button size="sm" onClick={() => alert("stripe checkout")} color="secondary">
+                    {t("buy_credits")}
+                  </Button>
                   <CreateButtonWithTeamsList
                     subtitle={t("new_workflow_subtitle").toUpperCase()}
                     createFunction={(teamId?: number) => createMutation.mutate({ teamId })}
