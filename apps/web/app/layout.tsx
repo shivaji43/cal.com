@@ -163,7 +163,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             "/insights",
           ]}
         />
-        <Providers dehydratedState={ssr.dehydrate()}>{children}</Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
