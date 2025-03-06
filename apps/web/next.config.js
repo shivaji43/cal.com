@@ -230,6 +230,7 @@ const nextConfig = {
         message: /Critical dependency: the request of a dependency is an expression/,
       },
     ];
+    config.stats = 'detailed';
     if (isServer) {
       if (process.env.SENTRY_DISABLE_SERVER_SOURCE_MAPS === "1") {
         config.devtool = false;

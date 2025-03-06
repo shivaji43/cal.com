@@ -8,11 +8,10 @@ import NextError from "next/error";
 import React from "react";
 
 import { getErrorFromUnknown } from "@calcom/lib/errors";
-import { HttpError } from "@calcom/lib/http-error";
+import type { HttpError } from "@calcom/lib/http-error";
 import logger from "@calcom/lib/logger";
-import { redactError } from "@calcom/lib/redactError";
 
-import { ErrorPage } from "@components/error/error-page";
+//import { redactError } from "@calcom/lib/redactError";
 
 // Adds HttpException to the list of possible error types.
 type AugmentedError = (NonNullable<NextPageContext["err"]> & HttpError) | null;
@@ -40,7 +39,8 @@ const CustomError: NextPage<CustomErrorProps> = (props) => {
     // can be captured here
     // e.g. Sentry.captureException(e);
   }
-  return <ErrorPage statusCode={statusCode} error={err} message={message} />;
+  return <>Bad!</>;
+  //return <ErrorPage statusCode={statusCode} error={err} message={message} />;
 };
 
 /**
@@ -59,19 +59,19 @@ CustomError.getInitialProps = async (ctx: AugmentedNextPageContext) => {
   errorInitialProps.hasGetInitialPropsRun = true;
 
   // If a HttpError message, let's override defaults
-  if (err instanceof HttpError) {
-    const redactedError = redactError(err);
-    errorInitialProps.statusCode = err.statusCode;
-    errorInitialProps.title = redactedError.name;
-    errorInitialProps.message = redactedError.message;
-    errorInitialProps.err = {
-      ...redactedError,
-      url: err.url,
-      statusCode: err.statusCode,
-      cause: err.cause,
-      method: err.method,
-    };
-  }
+  // if (err instanceof HttpError) {
+  //   const redactedError = redactError(err);
+  //   errorInitialProps.statusCode = err.statusCode;
+  //   errorInitialProps.title = redactedError.name;
+  //   errorInitialProps.message = redactedError.message;
+  //   errorInitialProps.err = {
+  //     ...redactedError,
+  //     url: err.url,
+  //     statusCode: err.statusCode,
+  //     cause: err.cause,
+  //     method: err.method,
+  //   };
+  // }
 
   if (res) {
     // Running on the server, the response object is available.

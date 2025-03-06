@@ -6,7 +6,7 @@ import CacheProvider from "react-inlinesvg/provider";
 
 import { trpc } from "@calcom/trpc/react";
 
-import type { AppProps } from "@lib/app-providers";
+import type { AppProps } from "@lib/app-providers-types";
 
 import "../styles/globals.css";
 
