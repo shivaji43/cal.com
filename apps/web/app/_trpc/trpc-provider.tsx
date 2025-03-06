@@ -15,6 +15,8 @@ export type Endpoint = (typeof ENDPOINTS)[number];
 
 const MAX_QUERY_RETRIES = 3;
 
+console.log("-------------in trpc-provider.tsx");
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const resolveEndpoint = (links: any) => {
   // TODO: Update our trpc routes so they are more clear.

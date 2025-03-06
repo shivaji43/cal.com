@@ -16,6 +16,10 @@ import "../styles/globals.css";
 import { SpeculationRules } from "./SpeculationRules";
 import { Providers } from "./providers";
 
+const start = performance.now();
+
+console.log("-------IN layout.tsx");
+
 const interFont = Inter({ subsets: ["latin"], variable: "--font-inter", preload: true, display: "swap" });
 const calFont = localFont({
   src: "../fonts/CalSans-SemiBold.woff2",
@@ -47,7 +51,10 @@ const getFallbackProps = () => ({
   embedColorScheme: false,
 });
 
+const end = performance.now();
+console.log("--------TIME TO IMPORT layout.tsx", end - start);
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const startRootLayout = performance.now();
   const h = headers();
 
   const fullUrl = h.get("x-url") ?? "";
@@ -60,6 +67,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     : await getInitialProps(fullUrl);
 
   const ssr = await ssrInit(buildLegacyCtx(h, cookies(), {}, {}));
+  const endRootLayout = performance.now();
+  console.log("---------TIME TO rootLayout", endRootLayout - startRootLayout);
   return (
     <html
       lang={locale}

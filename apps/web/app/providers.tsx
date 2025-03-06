@@ -8,6 +8,8 @@ import CacheProvider from "react-inlinesvg/provider";
 import useIsBookingPage from "@lib/hooks/useIsBookingPage";
 import PlainChat from "@lib/plain/dynamicProvider";
 
+console.log("-----------in providers.tsx");
+
 type ProvidersProps = {
   children: React.ReactNode;
   dehydratedState: DehydratedState;

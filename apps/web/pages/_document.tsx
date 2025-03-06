@@ -1,4 +1,3 @@
-import type { IncomingMessage } from "http";
 import { dir } from "i18next";
 import type { NextPageContext } from "next";
 import type { DocumentContext, DocumentProps } from "next/document";
@@ -8,6 +7,10 @@ import { z } from "zod";
 import { IS_PRODUCTION } from "@calcom/lib/constants";
 
 import { csp } from "@lib/csp";
+
+const startTop = performance.now();
+
+console.log("---------IN _document.tsx");
 
 type Props = Record<string, unknown> & DocumentProps & { newLocale: string };
 function setHeader(ctx: NextPageContext, name: string, value: string) {
@@ -20,6 +23,7 @@ function setHeader(ctx: NextPageContext, name: string, value: string) {
 }
 class MyDocument extends Document<Props> {
   static async getInitialProps(ctx: DocumentContext) {
+    const start = performance.now();
     const { nonce } = csp(ctx.req || null, ctx.res || null);
     if (!process.env.CSP_POLICY) {
       setHeader(ctx, "x-csp", "not-opted-in");
@@ -28,13 +32,13 @@ class MyDocument extends Document<Props> {
       setHeader(ctx, "x-csp", "initialPropsOnly");
     }
 
-    const getLocaleModule = ctx.req ? await import("@calcom/features/auth/lib/getLocale") : null;
+    //const getLocaleModule = ctx.req ? await import("@calcom/features/auth/lib/getLocale") : null;
 
-    const newLocale =
-      ctx.req && getLocaleModule
-        ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await getLocaleModule.getLocale(ctx.req as IncomingMessage & { cookies: Record<string, any> })
-        : "en";
+    const newLocale = "en";
+    // ctx.req && getLocaleModule
+    //   ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //     await getLocaleModule.getLocale(ctx.req as IncomingMessage & { cookies: Record<string, any> })
+    //   : "en";
 
     const asPath = ctx.asPath || "";
     // Use a dummy URL as default so that URL parsing works for relative URLs as well. We care about searchParams and pathname only
@@ -46,6 +50,8 @@ class MyDocument extends Document<Props> {
       !isEmbedSnippetGeneratorPath;
     const embedColorScheme = parsedUrl.searchParams.get("ui.color-scheme");
     const initialProps = await Document.getInitialProps(ctx);
+    const end = performance.now();
+    console.log("--------TIME TO LOAD _document.tsx", end - start);
     return { isEmbed, embedColorScheme, nonce, ...initialProps, newLocale };
   }
 
@@ -141,5 +147,6 @@ class MyDocument extends Document<Props> {
     );
   }
 }
-
+const endBottom = performance.now();
+console.log("------TIME TO IMPORT _document.tsx", endBottom - startTop);
 export default MyDocument;

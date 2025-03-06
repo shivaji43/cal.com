@@ -10,6 +10,8 @@ import type { AppProps } from "@lib/app-providers-types";
 
 import "../styles/globals.css";
 
+const startTop = performance.now();
+
 function MyApp(props: AppProps) {
   const { Component, pageProps } = props;
 
@@ -36,6 +38,7 @@ declare global {
 }
 
 MyApp.getInitialProps = async (ctx: AppContextType) => {
+  const start = performance.now();
   const { req } = ctx.ctx;
 
   let newLocale = "en";
@@ -48,6 +51,9 @@ MyApp.getInitialProps = async (ctx: AppContextType) => {
     newLocale = window.calNewLocale;
   }
 
+  const end = performance.now();
+  console.log("---------TIME TO LOAD _app.tsx", end - start);
+
   return {
     pageProps: {
       newLocale,
@@ -56,5 +62,8 @@ MyApp.getInitialProps = async (ctx: AppContextType) => {
 };
 
 const WrappedMyApp = trpc.withTRPC(MyApp);
+
+const endBottom = performance.now();
+console.log("--------TIME TO IMPORT _app.tsx", endBottom - startTop);
 
 export default WrappedMyApp;

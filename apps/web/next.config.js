@@ -200,7 +200,6 @@ const nextConfig = {
     ignoreDuringBuilds: !!process.env.CI,
   },
   transpilePackages: [
-    "@calcom/app-store",
     "@calcom/dayjs",
     "@calcom/emails",
     "@calcom/embed-core",
@@ -229,8 +228,12 @@ const nextConfig = {
       {
         message: /Critical dependency: the request of a dependency is an expression/,
       },
+      {
+        message:
+          /Critical dependency: require function is used in a way in which dependencies cannot be statically extracted/,
+      },
     ];
-    config.stats = 'detailed';
+    config.stats = "detailed";
     if (isServer) {
       if (process.env.SENTRY_DISABLE_SERVER_SOURCE_MAPS === "1") {
         config.devtool = false;
