@@ -1,5 +1,4 @@
 import * as Popover from "@radix-ui/react-popover";
-import { format } from "date-fns";
 
 import { Button } from "@calcom/ui";
 import classNames from "@calcom/ui/classNames";
@@ -42,7 +41,7 @@ const DatePicker = ({ minDate, disabled, date, onDatesChange, className }: Props
             color="secondary"
             EndIcon="calendar"
             className={classNames("justify-between text-left font-normal", !date && "text-subtle")}>
-            {date ? <>{format(date, "LLL dd, y")}</> : <span>Pick a date</span>}
+            {date ? <>{date.toDateString()}</> : <span>Pick a date</span>}
           </Button>
         </Popover.Trigger>
         <Popover.Content

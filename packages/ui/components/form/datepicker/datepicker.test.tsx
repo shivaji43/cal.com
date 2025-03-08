@@ -1,5 +1,4 @@
 import { render, fireEvent } from "@testing-library/react";
-import { format } from "date-fns";
 import { vi } from "vitest";
 
 import DatePicker from "./DatePicker";
@@ -14,7 +13,7 @@ describe("Tests for DatePicker Component", () => {
     const { getByTestId } = render(<DatePicker date={testDate} />);
 
     const dateButton = getByTestId("pick-date");
-    expect(dateButton).toHaveTextContent(format(testDate, "LLL dd, y"));
+    expect(dateButton).toHaveTextContent(testDate.toDateString());
   });
 
   test("Should show placeholder when no date is provided", () => {

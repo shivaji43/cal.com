@@ -1,0 +1,57 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["modules/*"],
+      "@components/*": ["./components/*"],
+      "@pages/*": ["./pages/*"],
+      "@lib/*": ["./lib/*"],
+      "@server/*": ["./server/*"],
+      "@prisma/client/*": ["../../packages/prisma/client/*"],
+      "@calcom/repository/*": ["@../../packages/lib/server/repository/*"],
+      "@calcom/ui/*": ["../../packages/ui/components/*"],
+      "@calcom/app-store": ["../../packages/app-store"],
+      "@calcom/app-store/*": ["../../packages/app-store/*"],
+      "@calcom/dayjs": ["../../packages/dayjs"],
+      "@calcom/dayjs/*": ["../../packages/dayjs/*"],
+      "@calcom/features": ["../../packages/features"],
+      "@calcom/features/*": ["../../packages/features/*"],
+      "@calcom/lib": ["../../packages/lib"],
+      "@calcom/lib/*": ["../../packages/lib/*"],
+      "@calcom/prisma": ["../../packages/prisma"],
+      "@calcom/prisma/*": ["../../packages/prisma/*"],
+    }
+  },
+  "include": [
+    /* Find a way to not require this - App files don't belong here. */
+    "../../packages/app-store/routing-forms/env.d.ts",
+    "next-env.d.ts",
+    "../../packages/types/*.d.ts",
+    "../../packages/types/next-auth.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "../../packages/features/bookings/lib/getBookingInfo.ts",
+    "../../packages/features/bookings/lib/getUserBooking.ts",
+    "../../packages/features/Segment.tsx"
+  ],
+  "exclude": ["node_modules"]
+}

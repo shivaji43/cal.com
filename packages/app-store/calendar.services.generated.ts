@@ -7,7 +7,6 @@ export const CalendarServiceMap = {
   caldavcalendar: import("./caldavcalendar/lib/CalendarService"),
   exchange2013calendar: import("./exchange2013calendar/lib/CalendarService"),
   exchange2016calendar: import("./exchange2016calendar/lib/CalendarService"),
-  exchangecalendar: import("./exchangecalendar/lib/CalendarService"),
   feishucalendar: import("./feishucalendar/lib/CalendarService"),
   googlecalendar: import("./googlecalendar/lib/CalendarService"),
   "ics-feedcalendar": import("./ics-feedcalendar/lib/CalendarService"),

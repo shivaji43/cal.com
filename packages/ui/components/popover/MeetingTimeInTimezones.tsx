@@ -1,13 +1,5 @@
 import * as Popover from "@radix-ui/react-popover";
 
-import {
-  formatTime,
-  isNextDayInTimezone,
-  isPreviousDayInTimezone,
-  isSupportedTimeZone,
-  sortByTimezone,
-} from "@calcom/lib/date-fns";
-
 import { Icon } from "../icon";
 
 type Attendee = {
@@ -39,7 +31,7 @@ const MeetingTimeInTimezones = ({
 
   // If attendeeTimezone is unsupported, we fallback to host timezone. Unsupported Attendee timezone can be used due to bad API booking request in the past | backward-compatibility
   const attendeeTimezones = attendees.map((attendee) => {
-    return isSupportedTimeZone(attendee.timeZone) ? attendee.timeZone : userTimezone;
+    return true; //isSupportedTimeZone(attendee.timeZone) ? attendee.timeZone : userTimezone;
   });
   const uniqueTimezones = [userTimezone, ...attendeeTimezones].filter(
     (value, index, self) => self.indexOf(value) === index
@@ -48,17 +40,16 @@ const MeetingTimeInTimezones = ({
   // Convert times to time in timezone, and then sort from earliest to latest time in timezone.
   const times = uniqueTimezones
     .map((timezone) => {
-      const isPreviousDay = isPreviousDayInTimezone(startTime, userTimezone, timezone);
-      const isNextDay = isNextDayInTimezone(startTime, userTimezone, timezone);
+      const isPreviousDay = false;
+      const isNextDay = false;
       return {
-        startTime: formatTime(startTime, timeFormat, timezone),
-        endTime: formatTime(endTime, timeFormat, timezone),
+        startTime: startTime.toString(), timeFormat, timezone,
+        endTime: endTime.toString(), timeFormat, timezone,
         timezone,
         isPreviousDay,
         isNextDay,
       };
     })
-    .sort((timeA, timeB) => sortByTimezone(timeA.timezone, timeB.timezone));
 
   // We don't show the popover if there's only one timezone.
   if (times.length === 1) return null;

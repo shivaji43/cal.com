@@ -1,7 +1,6 @@
 "use client";
 
 import * as Popover from "@radix-ui/react-popover";
-import { format } from "date-fns";
 import * as React from "react";
 
 import classNames from "@calcom/ui/classNames";
@@ -74,10 +73,10 @@ export function DatePickerWithRange({
             {dates?.startDate ? (
               dates?.endDate ? (
                 <>
-                  {format(dates.startDate, "LLL dd, y")} - {format(dates.endDate, "LLL dd, y")}
+                  {dates.startDate.toDateString()} - {dates.endDate.toString()}
                 </>
               ) : (
-                <>{format(dates.startDate, "LLL dd, y")} - End</>
+                <>{dates.startDate.toDateString()} - End</>
               )
             ) : (
               <span>Pick a date</span>

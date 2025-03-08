@@ -224,6 +224,74 @@ const nextConfig = {
     unoptimized: true,
   },
   webpack: (config, { webpack, buildId, isServer }) => {
+    const moduleStartTimes = new Map();
+    if (isServer) {
+      config.plugins.push({
+        apply(compiler) {
+          // When a module starts being processed, we track its start time.
+          compiler.hooks.compilation.tap('TrackModuleStartTime', (compilation) => {
+            compilation.hooks.buildModule.tap('TrackModuleBuildStart', (module) => {
+              if (module.resource) {
+                // Mark the start time of module processing
+                module.buildStartTime = performance.now();
+              }
+            });
+          });
+
+          // After the module is built, calculate the time taken for the build.
+          compiler.hooks.compilation.tap('TrackModuleEndTime', (compilation) => {
+            compilation.hooks.afterOptimizeModules.tap('TrackModuleAfterBuild', () => {
+              // After all modules are processed, log the time taken for each one
+              compilation.modules.forEach((module) => {
+                if (module.buildStartTime) {
+                  const endTime = performance.now();
+                  const duration = endTime - module.buildStartTime;
+
+                  if (!module.resource.includes("node_modules"))
+                    console.log(`Module: ${module.resource}, built in: ${duration.toFixed(2)} ms`);
+                }
+              });
+            });
+          });
+        }
+        // apply(compiler) {
+        //   // When a module starts being processed, we track its start time.
+        //   compiler.hooks.compilation.tap('TrackModuleStartTime', (compilation) => {
+        //     compilation.hooks.buildModule.tap('TrackModuleBuildStart', (module) => {
+        //       if (module.resource) {
+        //         // Mark the start time of the outer module (not each file)
+        //         // For now, use the first encountered file as the "outer" module.
+        //         const outerModule = module.context || module.resource.split('/')[0];  // You can adjust this to identify the outer module
+        //         if (!moduleStartTimes.has(outerModule)) {
+        //           moduleStartTimes.set(outerModule, performance.now());
+        //         }
+        //       }
+        //     });
+        //   });
+
+        //   // After the module is built, calculate the time taken for the build.
+        //   compiler.hooks.compilation.tap('TrackModuleEndTime', (compilation) => {
+        //     compilation.hooks.afterOptimizeModules.tap('TrackModuleAfterBuild', () => {
+        //       compilation.modules.forEach((module) => {
+        //         if (module.resource) {
+        //           const outerModule = module.context || module.resource.split('/')[0];  // Identify the "outer" module
+        //           if (moduleStartTimes.has(outerModule)) {
+        //             const startTime = moduleStartTimes.get(outerModule);
+        //             const endTime = performance.now();
+        //             const duration = endTime - startTime;
+
+        //             // Log the total time taken for the outer module (first file in module group)
+        //             console.log(`Module Group: ${outerModule}, built in: ${duration.toFixed(2)} ms`);
+        //             moduleStartTimes.delete(outerModule);  // Ensure we log only once for each outer module
+        //           }
+        //         }
+        //       });
+        //     });
+        //   });
+        // },
+      });
+    }
+
     config.ignoreWarnings = [
       {
         message: /Critical dependency: the request of a dependency is an expression/,
