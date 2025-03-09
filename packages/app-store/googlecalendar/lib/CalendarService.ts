@@ -240,6 +240,8 @@ export default class GoogleCalendarService implements Calendar {
   };
 
   public authedCalendar = async () => {
+    const { calendar_v3 } = await import("@googleapis/calendar");
+
     let delegationCredentialAuthedCalendar;
 
     if (this.credential.delegatedTo) {
