@@ -177,18 +177,17 @@ const orgDomainMatcherConfig = {
 /** @type {import("next").NextConfig} */
 const nextConfig = {
   output: process.env.BUILD_STANDALONE === "true" ? "standalone" : undefined,
+  serverExternalPackages: [
+    "next-i18next",
+    "deasync",
+    "http-cookie-agent", // Dependencies of @ewsjs/xhr
+    "rest-facade",
+    "superagent-proxy", // Dependencies of @tryvital/vital-node
+  ],
   experimental: {
     // externalize server-side node_modules with size > 1mb, to improve dev mode performance/RAM usage
-    serverComponentsExternalPackages: ["next-i18next"],
     optimizePackageImports: ["@calcom/ui"],
-    instrumentationHook: true,
-    serverActions: true,
-  },
-  i18n: {
-    ...i18n,
-    defaultLocale: "en",
-    locales: ["en"],
-    localeDetection: false,
+    turbo: {},
   },
   productionBrowserSourceMaps: process.env.SENTRY_DISABLE_CLIENT_SOURCE_MAPS === "0",
   /* We already do type check on GH actions */
@@ -318,7 +317,6 @@ const nextConfig = {
       fs: false,
       // ignore module resolve errors caused by the server component bundler
       "pg-native": false,
-      "superagent-proxy": false,
     };
 
     /**
