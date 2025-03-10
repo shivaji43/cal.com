@@ -1,6 +1,3 @@
-import { withAppDirSsr } from "../../../WithAppDirSsr";
-import type { PageProps } from "../../../_types";
-import { _generateMetadata } from "../../../_utils";
 import { cookies, headers } from "next/headers";
 
 import { getServerSideProps } from "@lib/apps/getServerSideProps";
@@ -8,11 +5,11 @@ import { buildLegacyCtx } from "@lib/buildLegacyCtx";
 
 import AppsPage from "~/apps/apps-view";
 
+import { withAppDirSsr } from "../../../WithAppDirSsr";
+import type { PageProps } from "../../../_types";
+
 export const generateMetadata = async () => {
-  return await _generateMetadata(
-    (t) => t("app_store"),
-    (t) => t("app_store_description")
-  );
+  return {};
 };
 
 const getData = withAppDirSsr(getServerSideProps);

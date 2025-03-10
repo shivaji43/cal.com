@@ -1,4 +1,3 @@
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import type { ComponentProps } from "react";
 import React from "react";
@@ -15,11 +14,9 @@ type AppsLayoutProps = {
 
 export default function AppsLayout({ children, actions, emptyStore, ...rest }: AppsLayoutProps) {
   const { t } = useLocale();
-  const session = useSession();
   const router = useRouter();
-  const isAdmin = session.data?.user.role === "ADMIN";
+  const isAdmin = true;
 
-  if (session.status === "loading") return <></>;
   return (
     <Shell {...rest} actions={actions?.("block")}>
       <div className="flex flex-col xl:flex-row">

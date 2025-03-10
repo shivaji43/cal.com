@@ -7,8 +7,6 @@ import { getServerSession } from "@calcom/features/auth/lib/getServerSession";
 import prisma from "@calcom/prisma";
 import type { AppGetServerSidePropsContext } from "@calcom/types/AppGetServerSideProps";
 
-import { ssrInit } from "@server/lib/ssr";
-
 const paramsSchema = z.object({
   pages: z.array(z.string()),
 });

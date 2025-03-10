@@ -1,13 +1,11 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 import { WEBAPP_URL } from "@calcom/lib/constants";
 
 export function useRedirectToLoginIfUnauthenticated(isPublic = false) {
-  const { data: session, status } = useSession();
   const loading = status === "loading";
   const router = useRouter();
   useEffect(() => {
@@ -15,16 +13,15 @@ export function useRedirectToLoginIfUnauthenticated(isPublic = false) {
       return;
     }
 
-    if (!loading && !session) {
+    if (!loading) {
       const urlSearchParams = new URLSearchParams();
       urlSearchParams.set("callbackUrl", `${WEBAPP_URL}${location.pathname}${location.search}`);
       router.replace(`/auth/login?${urlSearchParams.toString()}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, session, isPublic]);
+  }, [loading, isPublic]);
 
   return {
-    loading: loading && !session,
-    session,
+    loading: false,
   };
 }
