@@ -1,10 +1,11 @@
+/** @type {import("postcss-load-config").Config} */
 const config = {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-    "postcss-import": {},
-    "postcss-prefixwrap": `.calcom-atoms`,
-  },
+  plugins: [
+    require("tailwindcss"),
+    require("autoprefixer"),
+    require("postcss-import"),
+    require("postcss-prefixwrap")(".calcom-atoms"),
+  ],
 };
 
-export default config;
+module.exports = config;
