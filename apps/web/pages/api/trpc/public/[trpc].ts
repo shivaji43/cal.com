@@ -1,8 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createContext } from "@calcom/trpc/server/createContext";
-import { resolveHTTPResponse } from "@trpc/server/http";
+import { createNextApiHandler } from "@trpc/server/adapters/next";
 import { router } from "@calcom/trpc/server/trpc";
-
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -36,68 +35,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       console.log(`[tRPC] Loaded procedure: ${procedureName}`);
       
-      // Special handling for slots which is a router
-      if (procedureName === 'slots' || procedureName === 'slotsRouter') {
-        // Create a minimal router with just the slots router
-        const minimalRouter = router({
-          slots: procedureImplementation,
-        });
-        
-        // Create the context
-        const ctx = await createContext({ req, res });
-        
-        // Process the request with the minimal router
-        const result = await resolveHTTPResponse({
-          router: minimalRouter,
-          path,
-          req,
-          createContext: () => ctx,
-          onError: (o) => {
-            console.error(o.error);
-            return { status: o.error.code === 'NOT_FOUND' ? 404 : 500 };
-          },
-        });
-        
-        // Send the response
-        res.status(result.status);
-        if (result.headers) {
-          Object.keys(result.headers).forEach(key => {
-            res.setHeader(key, result.headers[key]);
-          });
-        }
-        res.end(result.body);
-        return;
-      }
-      
       // Create a minimal router with just the requested procedure
       console.log(`[tRPC] Creating minimal router for procedure: ${procedureName}`);
       const minimalRouter = router({
         [procedureName]: procedureImplementation,
       });
       
-      // Create the context
-      const ctx = await createContext({ req, res });
-      
-      // Process the request with the minimal router
-      const result = await resolveHTTPResponse({
+      // Use the Next.js adapter
+      const nextApiHandler = createNextApiHandler({
         router: minimalRouter,
-        path,
-        req,
-        createContext: () => ctx,
-        onError: (o) => {
-          console.error(o.error);
-          return { status: o.error.code === 'NOT_FOUND' ? 404 : 500 };
+        createContext,
+        onError: (opts) => {
+          console.error(opts.error);
+          return {
+            status: opts.error.code === 'NOT_FOUND' ? 404 : 500,
+          };
         },
       });
       
-      // Send the response
-      res.status(result.status);
-      if (result.headers) {
-        Object.keys(result.headers).forEach(key => {
-          res.setHeader(key, result.headers[key]);
-        });
-      }
-      res.end(result.body);
+      // Call the handler
+      await nextApiHandler(req, res);
+      
     } catch (importError) {
       console.error(`[tRPC] Error importing procedure: ${importError}`);
       
@@ -107,29 +65,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Import the full router
       const { publicViewerRouter } = await import("@calcom/trpc/server/routers/publicViewer/_router");
       
-      // Create the context
-      const ctx = await createContext({ req, res });
-      
-      // Process the request with the full router
-      const result = await resolveHTTPResponse({
+      // Use the Next.js adapter for the full router
+      const nextApiHandler = createNextApiHandler({
         router: publicViewerRouter,
-        path,
-        req,
-        createContext: () => ctx,
-        onError: (o) => {
-          console.error(o.error);
-          return { status: o.error.code === 'NOT_FOUND' ? 404 : 500 };
+        createContext,
+        onError: (opts) => {
+          console.error(opts.error);
+          return {
+            status: opts.error.code === 'NOT_FOUND' ? 404 : 500,
+          };
         },
       });
       
-      // Send the response
-      res.status(result.status);
-      if (result.headers) {
-        Object.keys(result.headers).forEach(key => {
-          res.setHeader(key, result.headers[key]);
-        });
-      }
-      res.end(result.body);
+      // Call the handler
+      await nextApiHandler(req, res);
     }
     
     // After handling the request
