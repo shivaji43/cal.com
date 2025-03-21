@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 
-import { Icon } from "@calcom/ui/components/icon";
 import classNames from "@calcom/ui/classNames";
+import { Icon } from "@calcom/ui/components/icon";
 
 interface HeaderProps {
   children: React.ReactNode;

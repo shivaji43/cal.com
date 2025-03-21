@@ -1,6 +1,6 @@
+import type { TFunction } from "i18next";
 // eslint-disable-next-line no-restricted-imports
 import { get } from "lodash";
-import type { TFunction } from "i18next";
 import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
@@ -10,11 +10,11 @@ import type { FormValues } from "@calcom/features/eventtypes/lib/types";
 import type { Prisma } from "@calcom/prisma/client";
 import { SchedulingType } from "@calcom/prisma/enums";
 import type { _EventTypeModel } from "@calcom/prisma/zod/eventtype";
+import classNames from "@calcom/ui/classNames";
 import { Badge } from "@calcom/ui/components/badge";
+import { Switch } from "@calcom/ui/components/form";
 import { Icon } from "@calcom/ui/components/icon";
 import { Tooltip } from "@calcom/ui/components/tooltip";
-import classNames from "@calcom/ui/classNames";
-import { Switch } from "@calcom/ui/components/form";
 
 export const LockedSwitch = (
   isManagedEventType: boolean,

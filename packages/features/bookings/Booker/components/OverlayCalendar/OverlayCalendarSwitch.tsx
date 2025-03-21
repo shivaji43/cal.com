@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 
 import { useLocale } from "@calcom/lib/hooks/useLocale";
-import { Switch } from "@calcom/ui/components/form";
-import { Button } from "@calcom/ui/components/button";
 import classNames from "@calcom/ui/classNames";
+import { Button } from "@calcom/ui/components/button";
+import { Switch } from "@calcom/ui/components/form";
 
 import { useBookerStore } from "../../store";
 import { useOverlayCalendarStore } from "./store";

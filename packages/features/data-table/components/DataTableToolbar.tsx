@@ -6,10 +6,10 @@ import type { ComponentPropsWithoutRef } from "react";
 
 import { useDebounce } from "@calcom/lib/hooks/useDebounce";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
-import type { ButtonProps } from "@calcom/ui/components/button";
-import { Input } from "@calcom/ui/components/form";
-import { Button } from "@calcom/ui/components/button";
 import classNames from "@calcom/ui/classNames";
+import type { ButtonProps } from "@calcom/ui/components/button";
+import { Button } from "@calcom/ui/components/button";
+import { Input } from "@calcom/ui/components/form";
 
 import { useColumnFilters } from "../hooks";
 

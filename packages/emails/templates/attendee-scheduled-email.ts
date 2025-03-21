@@ -1,6 +1,6 @@
+import type { TFunction } from "i18next";
 // eslint-disable-next-line no-restricted-imports
 import { cloneDeep } from "lodash";
-import type { TFunction } from "i18next";
 
 import { getRichDescription } from "@calcom/lib/CalEventParser";
 import { TimeFormat } from "@calcom/lib/timeFormat";
